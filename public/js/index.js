@@ -1,7 +1,29 @@
 
 var socket = io();
+
+function scrollToBottom() {
+  //selectors
+  var messages = $('#messages');
+  var newMessage = messages.children('li:last-child');
+  //heights
+  var clientHeight = messages.prop('clientHeight');
+  var scrollTop = messages.prop('scrollTop');
+  var scrollHeight = messages.prop('scrollHeight');
+  var newMessageHeight = newMessage.innerHeight();
+  var lastMessageHeight = newMessage.prev().innerHeight();
+
+
+  if(clientHeight+scrollTop +newMessageHeight+lastMessageHeight>= scrollHeight){
+    messages.scrollTop(scrollHeight);
+  }
+}
+
 socket.on('connect',function() {
   console.log('connected to server');
+});
+
+socket.on('disconnect',function() {
+  console.log('server disconnected');
 });
 
 socket.on('newMessage',function(message) {
@@ -12,13 +34,11 @@ socket.on('newMessage',function(message) {
     from:message.from,
     createdAt:formattedTime
   });
-
-  $('#messages').append(html)
+  $('#messages').append(html);
+  scrollToBottom();
 });
 
-socket.on('disconnect',function() {
-  console.log('server disconnected');
-});
+
 
 socket.on('newLocationMessage',function(message) {
   var formattedTime = moment(message.createdAt).format('h:mm a');
@@ -29,17 +49,11 @@ socket.on('newLocationMessage',function(message) {
     createdAt:formattedTime
   });
   $('#messages').append(html);
-
-
-    // var li = $('<li></li>');
-    // var a = $('<a target="_blank">My Current Location</a>');
-    //
-    // li.text(`${message.from} ${formattedTime}: `);
-    // a.attr('href',message.url);
-    // li.append(a);
-    // $('#messages').append(li);
-
+  scrollToBottom();
 });
+
+
+
 
 $('#message-form').on('submit',function (e){
   e.preventDefault();
@@ -55,7 +69,6 @@ $('#message-form').on('submit',function (e){
 
 var locationButton = $('#send-location');
 locationButton.on('click',function () {
-
   if(!navigator.geolocation){
     return alert('Geolocation not supported by your browser');
   }
@@ -67,7 +80,6 @@ locationButton.on('click',function () {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude
     });
-
   },function() {
     locationButton.removeAttr('disabled').text('Send Location');
     alert('unable to share location');
