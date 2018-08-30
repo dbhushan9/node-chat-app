@@ -13,24 +13,20 @@ var io = socketIO(server);
 app.use(express.static(publicPath ));
 
 io.on('connection',(socket)=>{
-  console.log('new user connected');
 
   socket.emit('newMessage',generateMessage('Admin','Welcome to chat App'));
-
   socket.broadcast.emit('newMessage',generateMessage('Admin','New user joined'));
 
   socket.on('createMessage',(message,callback)=>{
       io.emit('newMessage',generateMessage(message.from,message.text));
-        callback();
+      callback();
   });
-
   socket.on('createLocationMessage',(coords)=>{
-    io.emit('newLocationMessage',generateLocationMessage('Admin',coords.latitude,coords.longitude))
+      io.emit('newLocationMessage',generateLocationMessage('Admin',coords.latitude,coords.longitude))
   });
-
 
   socket.on('disconnect',()=>{
-    console.log('user disconnected');
+      console.log('user disconnected');
   });
 });
 
