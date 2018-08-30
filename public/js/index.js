@@ -27,29 +27,33 @@ socket.on('newLocationMessage',function(message) {
 
 $('#message-form').on('submit',function (e){
   e.preventDefault();
+  var messageTextBox = $('[name=message]');
   socket.emit('createMessage',{
     from:'User',
-    text:$('[name=message]').val()
+    text:messageTextBox.val()
   },function(){
-
+    messageTextBox.val('')
   });
 });
 
 
 var locationButton = $('#send-location');
 locationButton.on('click',function () {
+
   if(!navigator.geolocation){
     return alert('Geolocation not supported by your browser');
   }
-
+  locationButton.attr('disabled','disabled').text('Send Location...');
   navigator.geolocation.getCurrentPosition(function (position) {
-console.log(position);
+    locationButton.removeAttr('disabled').text('Send Location');
+    console.log(position);
     socket.emit('createLocationMessage',{
       latitude: position.coords.latitude,
       longitude: position.coords.longitude
     });
 
   },function() {
+    locationButton.removeAttr('disabled').text('Send Location');
     alert('unable to share location');
   });
 });
