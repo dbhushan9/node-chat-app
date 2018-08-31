@@ -57,8 +57,6 @@ socket.on('newMessage',function(message) {
   scrollToBottom();
 });
 
-
-
 socket.on('newLocationMessage',function(message) {
   var formattedTime = moment(message.createdAt).format('h:mm a');
   var template = $('#location-message-template').html();
@@ -78,11 +76,11 @@ $('#message-form').on('submit',function (e){
   e.preventDefault();
   var messageTextBox = $('[name=message]');
   socket.emit('createMessage',{
-    from:'User',
     text:messageTextBox.val()
   },function(){
     messageTextBox.val('')
   });
+  console.log('send message');
 });
 
 
